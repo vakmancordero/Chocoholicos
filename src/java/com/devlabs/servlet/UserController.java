@@ -24,6 +24,14 @@ public class UserController extends HttpServlet {
     
     private final UserService userService = new UserService();
 
+    private Gson gson = new Gson();
+    
+    @Override
+    public void init() throws ServletException {
+        super.init();
+        
+    }
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -34,8 +42,6 @@ public class UserController extends HttpServlet {
         
         String type = request.getParameter("type");
         
-        System.out.println("type = " + type);
-        
         if (type != null) {
             
             String word = request.getParameter("word");
@@ -44,21 +50,25 @@ public class UserController extends HttpServlet {
                 
                 List<Member> members = this.userService.searchMembers(word);
                 
-                String membersJSON = "{\"members\": " + new Gson().toJson(members) + "}";
+                System.out.println(members);
                 
-                writer.write(membersJSON);
+                writer.print("{\"members\": " + gson.toJson(members) + "}");
                 
             } else if (type.equalsIgnoreCase("provider")) {
                 
                 List<Provider> providers = this.userService.searchProviders(word);
                 
-                writer.write("{\"providers\": " + new Gson().toJson(providers) + "}");
+                System.out.println(providers);
+                
+                writer.print("{\"providers\": " + gson.toJson(providers) + "}");
                 
             } else if (type.equalsIgnoreCase("service")) {
                 
-                List<Service> providers = this.userService.searchServices(word);
+                List<Service> services = this.userService.searchServices(word);
                 
-                writer.write("{\"services\": " + new Gson().toJson(providers) + "}");
+                System.out.println(services);
+                
+                writer.print("{\"services\": " + gson.toJson(services) + "}");
                 
             }
             
@@ -101,6 +111,20 @@ public class UserController extends HttpServlet {
                         
                         saved = this.userService.createMember(member);
                         
+                    } else if (type.equalsIgnoreCase("provider")) {
+                        
+                        Provider provider = new Provider(
+                                object.get("name").getAsString(), 
+                                object.get("address").getAsString(), 
+                                object.get("city").getAsString(), 
+                                object.get("state").getAsString(), 
+                                object.get("cp").getAsString(),
+                                object.get("user").getAsString(),
+                                object.get("password").getAsString()
+                        );
+                        
+                        saved = this.userService.createProvider(provider);
+                        
                     }
                     
                     writer.print(saved);
@@ -108,6 +132,18 @@ public class UserController extends HttpServlet {
                     break;
                     
                 case "list":
+                    
+                    String typeUser = request.getParameter("type");
+                    
+                    if (typeUser.equalsIgnoreCase("member")) {
+                        
+                        writer.print(gson.toJson(this.userService.getMembers()));
+                        
+                    } else if (typeUser.equalsIgnoreCase("provider")) {
+                        
+                        writer.print(gson.toJson(this.userService.getProviders()));
+                        
+                    }
                     
                     break;
                     

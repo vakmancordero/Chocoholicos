@@ -1,15 +1,11 @@
 package com.devlabs.model;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 @Entity
@@ -24,28 +20,20 @@ public class Provider implements Serializable {
     private String cp;
     private String user;
     private String password;
-    private List<Record> records = new ArrayList<>();
     
     public Provider() {
         
     }
     
-    public Provider(String name, String address, 
-            String city, String state, String cp) {
+    public Provider(String name, String address, String city, String state, 
+            String cp, String user, String password) {
         this.name = name;
         this.address = address;
         this.city = city;
         this.state = state;
         this.cp = cp;
-    }
-    public Provider(String name, String address, 
-            String city, String state, String cp, List<Record> records) {
-        this.name = name;
-        this.address = address;
-        this.city = city;
-        this.state = state;
-        this.cp = cp;
-        this.records = records;
+        this.user = user;
+        this.password = password;
     }
     
     @Id 
@@ -122,15 +110,6 @@ public class Provider implements Serializable {
         this.password = password;
     }
     
-    @OneToMany(fetch=FetchType.LAZY, mappedBy="provider")
-    public List<Record> getRecords() {
-        return this.records;
-    }
-    
-    public void setRecords(List<Record> records) {
-        this.records = records;
-    }
-
     @Override
     public String toString() {
         return this.name;

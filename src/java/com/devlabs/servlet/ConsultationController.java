@@ -1,8 +1,8 @@
 package com.devlabs.servlet;
 
-import com.devlabs.model.Member;
 import com.devlabs.model.Record;
 import com.devlabs.service.ConsultationService;
+import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import java.io.IOException;
@@ -20,10 +20,16 @@ import javax.servlet.http.HttpServletResponse;
 public class ConsultationController extends HttpServlet {
     
     private ConsultationService consultationService = new ConsultationService();
-
+    
+    private Gson gson = new Gson();
+    
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        
+//        PrintWriter writer = response.getWriter();
+//        
+//        writer.print(gson.toJson(this.consultationService.getRecords()));
         
     }
 
@@ -51,7 +57,7 @@ public class ConsultationController extends HttpServlet {
                         consultation.get("comment").getAsString()
                 );
                 
-                boolean saved = this.consultationService.createConsultation(record);
+                writer.print(this.consultationService.createConsultation(record));
                 
             }
             

@@ -37,6 +37,14 @@ public class UserService {
         return this.providerDao.create(provider) != null;
     }
     
+    public List<Provider> getProviders() {
+        return this.providerDao.readAll();
+    }
+    
+    public List<Member> getMembers() {
+        return this.memberDao.readAll();
+    }
+    
     public List<Provider> searchProviders(String word) {
         
         Criteria add = this.providerDao.getSession().createCriteria(

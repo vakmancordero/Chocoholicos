@@ -1,15 +1,11 @@
 package com.devlabs.model;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 @Entity
@@ -20,7 +16,6 @@ public class Service implements Serializable {
     private String code;
     private String name;
     private double price;
-    private List<Record> records = new ArrayList<>();
     
     public Service() {
         
@@ -30,12 +25,6 @@ public class Service implements Serializable {
         this.code = code;
         this.name = name;
         this.price = price;
-    }
-    public Service(String code, String name, double price, List<Record> records) {
-        this.code = code;
-        this.name = name;
-        this.price = price;
-        this.records = records;
     }
     
     @Id 
@@ -76,15 +65,6 @@ public class Service implements Serializable {
         this.price = price;
     }
     
-    @OneToMany(fetch=FetchType.LAZY, mappedBy="service")
-    public List<Record> getRecords() {
-        return this.records;
-    }
-    
-    public void setRecords(List<Record> records) {
-        this.records = records;
-    }
-
     @Override
     public String toString() {
         return this.name;

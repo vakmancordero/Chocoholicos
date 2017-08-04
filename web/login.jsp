@@ -58,7 +58,7 @@
                     </div>
                 </h1>
                 <form action="LoginController" method="POST" class="ui large form">
-                    <div class="ui stacked secondary  segment">
+                    <div class="ui stacked secondary segment">
                         <div class="field">
                             <div class="ui left icon input">
                                 <i class="user icon"></i>

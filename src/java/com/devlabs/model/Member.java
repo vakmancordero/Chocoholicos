@@ -24,7 +24,6 @@ public class Member implements Serializable {
     private String city;
     private String state;
     private String cp;
-    private List<Record> records = new ArrayList<>();
     
     public Member() {
         
@@ -36,14 +35,6 @@ public class Member implements Serializable {
         this.city = city;
         this.state = state;
         this.cp = cp;
-    }
-    public Member(String name, String address, String city, String state, String cp, List<Record> records) {
-        this.name = name;
-        this.address = address;
-        this.city = city;
-        this.state = state;
-        this.cp = cp;
-        this.records = records;
     }
     
     @Id 
@@ -102,13 +93,4 @@ public class Member implements Serializable {
         this.cp = cp;
     }
     
-    @OneToMany(fetch=FetchType.LAZY, mappedBy="member")
-    public List<Record> getRecords() {
-        return this.records;
-    }
-    
-    public void setRecords(List<Record> records) {
-        this.records = records;
-    }
-
 }

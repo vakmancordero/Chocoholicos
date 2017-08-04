@@ -8,26 +8,41 @@ app.controller('ChocoController', function ($scope, $http) {
     $scope.member = {};
     $scope.service = {};
     
+    $scope.members = [];
+    $scope.providers = [];
+    $scope.consultations = [];
+    
+    $scope.user.type = "";
+    
     angular.element(document).ready(function () {
+        initElements();
+        initValidator();
         
-        $('.masthead').visibility({
-            once: false,
-            onBottomPassed: function() {
-                $('.fixed.menu').transition('fade in');
+        $.ajax({
+            type: 'POST',
+            url: 'UserController',
+            data: {
+                action: "list",
+                type: "member"
             },
-            onBottomPassedReverse: function() {
-                $('.fixed.menu').transition('fade out');
+            success: function (result) {
+                $scope.members = JSON.parse(result);
             }
+
         });
         
-        $('.ui.sidebar').sidebar('attach events', '.toc.item');
-        
-        $('.ui.dropdown').dropdown();
-        
-        $('.special.cards .image').dimmer({on: 'hover'});
-        
-        $('#myContainer').transition('pulse');
+        $.ajax({
+            type: 'POST',
+            url: 'UserController',
+            data: {
+                action: "list",
+                type: "provider"
+            },
+            success: function (result) {
+                $scope.providers = JSON.parse(result);
+            }
 
+        });
     });
 
     $('#search_provider').search({
@@ -77,7 +92,15 @@ app.controller('ChocoController', function ($scope, $http) {
 
     $scope.saveUser = function() {
         
-        $scope.user.type = "member";
+        if ($scope.user.type === "provider")
+            if ($scope.user.password !== $scope.user.rePassword){
+                swal(
+                    'Error!',
+                    'Las contraseñas no coinciden!',
+                    'error'
+                );
+                return;
+            }
         
         $.ajax({
             type: 'POST',
@@ -100,9 +123,11 @@ app.controller('ChocoController', function ($scope, $http) {
                         'success'
                     );
                     
-                    setTimeout(function(){ window.location.reload(); }, 700);
+                    setTimeout(function(){ window.location.reload(); }, 1000);
                     
                 } else {
+                    
+                    console.log(result);
                     
                     swal(
                         'Error!',
@@ -143,13 +168,13 @@ app.controller('ChocoController', function ($scope, $http) {
                     
                     $scope.$apply();
                     
+                    $scope.closeAddConsultationMl();
+                    
                     swal(
                         'Correcto!',
                         'Consulta creada!',
                         'success'
                     );
-                    
-//                    setTimeout(function(){ window.location.reload(); }, 700);
                     
                 } else {
                     
@@ -171,12 +196,60 @@ app.controller('ChocoController', function ($scope, $http) {
         $('#addUserMl').modal('show');
     };
     
-    $scope.openConsultationMl = function() {
-        $('#addConsultationMl').modal('show');
-    };
-    
     $scope.openAddConsultationMl = function() {
         $('#addConsultationMl').modal('show');
     };
-
+    
+    $scope.closeAddConsultationMl = function() {
+        $('#addConsultationMl').modal('hide');
+    };
+    
+    $scope.openListUsersMl = function() {
+        $('#listUsersMl').modal('show');
+    };
+    
+    $scope.openListConsultationsMl = function() {
+        $('#listConsultationsMl').modal('show');
+    };
+    
+    function initElements() {
+        
+        $('.masthead').visibility({
+            once: false,
+            onBottomPassed: function() {
+                $('.fixed.menu').transition('fade in');
+            },
+            onBottomPassedReverse: function() {
+                $('.fixed.menu').transition('fade out');
+            }
+        });
+        
+        $('.ui.sidebar').sidebar('attach events', '.toc.item');
+        
+        $('.ui.dropdown').dropdown();
+        
+        $('.special.cards .image').dimmer({on: 'hover'});
+        
+        $('#myContainer').transition('pulse');
+        
+    }
+    
+    function initValidator() {
+        
+        $('#addUserForm').form({
+            fields: {
+                type: {
+                    identifier  : 'type',
+                    rules: [
+                        {
+                            type   : 'empty',
+                            prompt : 'Por favor, especifica un tipo'
+                        }
+                    ]
+                }
+            }
+        });
+        
+    }
+    
 });

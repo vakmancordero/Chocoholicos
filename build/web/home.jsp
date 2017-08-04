@@ -18,7 +18,7 @@
         <link href="<c:url value = "/css/home.css"/>" rel="stylesheet" rel="stylesheet" type="text/css">
         <link href="<c:url value = "/lib/sweet/sweetalert2.css"/>" rel="stylesheet" type="text/css">
         
-        <title>.: Iniciar sesión :.</title>
+        <title>.: Chocoholicos :.</title>
     </head>
     <body>
         
@@ -42,7 +42,6 @@
                             <a class="item" href="#">Eliminar consultas</a>
                         </div>
                     </div>
-                    <a href="#" class="item">Inventario</a>
                 </div>
             </div>
 
@@ -54,19 +53,15 @@
 
                     <div class="ui middle aligned piled segment container">
                         <div class="ui inverted segment">
-                            <h4>Sin funcionalidad</h4>
+                            <h4>Listado de entidades</h4>
                             <div class="ui inverted labeled icon menu">
-                                <a class="item">
-                                    <i class="add user icon"></i>
-                                    Item 1
+                                <a class="item" ng-click="openListUsersMl()">
+                                    <i class="address book icon"></i>
+                                    Listar usuarios
                                 </a>
-                                <a class="item">
-                                    <i class="configure icon"></i>
-                                    Item 2
-                                </a>
-                                <a class="item">
-                                    <i class="edit icon"></i>
-                                    Item 1
+                                <a class="item" ng-click="openListConsultationsMl()">
+                                    <i class="doctor icon"></i>
+                                    Listar consultas
                                 </a>
                             </div>
                         </div>
@@ -175,37 +170,94 @@
                         <form class="ui form" ng-submit="saveUser()" id="addUserForm">
                             <h4 class="ui dividing header">Información del usuario</h4>
                             <div class="field">
-                                <label>Nombre:</label>
-                                <input type="text" placeholder="Nombre" ng-model="user.name" required>
+                                <label>Tipo de usuario: </label>
+                                <select class="ui fluid dropdown" ng-model="user.type" required>
+                                    <option value="member" selected>Miembro</option>
+                                    <option value="provider">Proveedor</option>
+                                </select>
                             </div>
-                            <div class="field">
-                                <label>Dirección:</label>
-                                <input type="text" placeholder="Dirección" ng-model="user.address" required>
-                            </div>
-                            <div class="two fields">
-                                <div class="field">
-                                    <label>Código postal:</label>
-                                    <input type="text"  placeholder="CP" ng-model="user.cp" required>
+                            <div ng-switch on="user.type">
+                                <div ng-switch-when="member">
+                                    <div class="field">
+                                        <label>Nombre:</label>
+                                        <input type="text" placeholder="Nombre" ng-model="user.name" required>
+                                    </div>
+                                    <div class="field">
+                                        <label>Dirección:</label>
+                                        <input type="text" placeholder="Dirección" ng-model="user.address" required>
+                                    </div>
+                                    <div class="two fields">
+                                        <div class="field">
+                                            <label>Código postal:</label>
+                                            <input type="text"  placeholder="CP" ng-model="user.cp" required>
+                                        </div>
+                                        <div class="field">
+                                            <label>Ciudad</label>
+                                            <select class="ui fluid dropdown" ng-model="user.city" required>
+                                                <option disabled selected value> -- Seleccionar -- </option>
+                                                <option value="Tuxtla Gutierrez">Tuxtla Gutiérrez</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="field">
+                                        <div class="eight wide field">
+                                            <label>Estado</label>
+                                            <select class="ui fluid dropdown" ng-model="user.state" required>
+                                                <option disabled selected value> -- Seleccionar -- </option>
+                                                <option value="Activo">Activo</option>
+                                                <option value="Inactivo">Inactivo</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <button class="ui button" type="submit">Finalizar</button>
                                 </div>
-                                <div class="field">
-                                    <label>Ciudad</label>
-                                    <select class="ui fluid dropdown" ng-model="user.city" required id="cityCB">
-                                        <option disabled selected value> -- Seleccionar -- </option>
-                                        <option value="Tuxtla Gutierrez">Tuxtla Gutiérrez</option>
-                                    </select>
+                                <div ng-switch-when="provider">
+                                    <div class="field">
+                                        <label>Nombre de usuario:</label>
+                                        <input type="text" placeholder="Usuario" ng-model="user.user" required>
+                                    </div>
+                                    <div class="field">
+                                        <label>Contraseña:</label>
+                                        <input type="password" placeholder="Contraseña" ng-model="user.password" required>
+                                    </div>
+                                    <div class="field">
+                                        <label>Repetir contraseña:</label>
+                                        <input type="password" placeholder="Repetir contraseña" ng-model="user.rePassword" required>
+                                    </div>
+                                    <div class="field">
+                                        <label>Nombre:</label>
+                                        <input type="text" placeholder="Nombre" ng-model="user.name" required>
+                                    </div>
+                                    <div class="field">
+                                        <label>Dirección:</label>
+                                        <input type="text" placeholder="Dirección" ng-model="user.address" required>
+                                    </div>
+                                    <div class="two fields">
+                                        <div class="field">
+                                            <label>Código postal:</label>
+                                            <input type="text"  placeholder="CP" ng-model="user.cp" required>
+                                        </div>
+                                        <div class="field">
+                                            <label>Ciudad</label>
+                                            <select class="ui fluid dropdown" ng-model="user.city" required>
+                                                <option disabled selected value> -- Seleccionar -- </option>
+                                                <option value="Tuxtla Gutierrez">Tuxtla Gutiérrez</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="field">
+                                        <div class="eight wide field">
+                                            <label>Estado</label>
+                                            <select class="ui fluid dropdown" ng-model="user.state" required>
+                                                <option disabled selected value> -- Seleccionar -- </option>
+                                                <option value="active">Activo</option>
+                                                <option value="inactive">Inactivo</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <button class="ui button" type="submit">Finalizar</button>
                                 </div>
                             </div>
-                            <div class="field">
-                                <div class="eight wide field">
-                                    <label>Estado</label>
-                                    <select class="ui fluid dropdown" ng-model="user.state" required id="stateCB">
-                                        <option disabled selected value> -- Seleccionar -- </option>
-                                        <option value="active">Activo</option>
-                                        <option value="inactive">Inactivo</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <button class="ui button" type="submit">Finalizar</button>
                         </form>
                     </div>
                 </div>
@@ -283,61 +335,99 @@
                     </div>
                 </div>
             </div>
-<!--            <div id="addConsultationMl" class="ui modal">
+            
+            <div id="listUsersMl" class="ui modal" >
                 <i class="close icon"></i>
                 <div class="header">
-                    Nuevo usuario
+                    Tabla de usuarios
                 </div>
                 <div class="image content">
-                    <div class="ui medium image">
-                        <img src="<c:url value = "/img/patrick.png"/>">
-                    </div>
                     <div class="description">
-                        <form class="ui form">
-                            <h4 class="ui dividing header">Información del usuario</h4>
-                            <div class="field">
-                                <label>Nombre:</label>
-                                <input type="text" placeholder="Nombre" ng-model="user.name">
-                            </div>
-                            <div class="field">
-                                <label>Dirección:</label>
-                                <div class="fields">
-                                    <div class="twelve wide field">
-                                        <input type="text" placeholder="Calle">
-                                    </div>
-                                    <div class="four wide field">
-                                        <input type="text" placeholder="Número #">
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="two fields">
-                                <div class="field">
-                                    <label>Estado</label>
-                                    <select class="ui fluid dropdown">
-                                        <option value="">Estado</option>
-                                        <option value="AL">Chiapas</option>
-                                        <option value="AK">Guadalajara</option>
-                                        <option value="AZ">Veracruz</option>
-                                        <option value="AZ">Estado de México</option>
-                                        <option value="AZ">Monterrey</option>
-                                    </select>
-                                </div>
-                                <div class="field">
-                                    <label>Ciudad</label>
-                                    <select class="ui fluid dropdown">
-                                        <option value="">Ciudad</option>
-                                        <option value="AL">Tuxtla Gutiérrez</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="field">
-                                <div class="eight wide field">
-                                    <label>Código postal:</label>
-                                    <input type="text" placeholder="CP">
-                                </div>
-                            </div>
-                            <div class="ui button" tabindex="0">Finalizar</div>
-                        </form>
+                        
+                        <h1>Proveedores</h1>
+                        <table class="ui black table">
+                            <thead>
+                                <tr>
+                                    <th>Nombre</th>
+                                    <th>Dirección</th>
+                                    <th>Ciudad</th>
+                                    <th>Estado</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="provider in providers track by $index">
+                                    <td>{{provider.name}}</td>
+                                    <td>{{provider.address}}</td>
+                                    <td>{{provider.city}}</td>
+                                    <td>{{provider.state}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                                    
+                        <h1>Miembros</h1>
+                        <table class="ui black table">
+                            <thead>
+                                <tr>
+                                    <th>Nombre</th>
+                                    <th>Dirección</th>
+                                    <th>Ciudad</th>
+                                    <th>Estado</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="member in members track by $index">
+                                    <td>{{member.name}}</td>
+                                    <td>{{member.address}}</td>
+                                    <td>{{member.city}}</td>
+                                    <td>{{member.state}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="actions">
+                    <div class="ui negative right labeled icon button">
+                        Cerrar
+                        <i class="checkmark icon"></i>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Tabla de consultas -->
+<!--            <div id="listConsultationsMl" class="ui modal" >
+                <i class="close icon"></i>
+                <div class="header">
+                    Tabla de consultas
+                </div>
+                <div class="image content">
+                    <div class="description">
+                        <table class="ui black table">
+                            <thead>
+                                <tr>
+                                    <th>Proveedor</th>
+                                    <th>Miembro</th>
+                                    <th>Servicio</th>
+                                    <th>Fecha creación</th>
+                                    <th>Fecha consulta</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="consultation in consultations track by $index">
+                                    <td>{{consultation.provider}}</td>
+                                    <td>200</td>
+                                    <td>0g</td>
+                                    <td>0g</td>
+                                    <td>0g</td>
+                                </tr>
+                                <tr>
+                                    <td>Orange</td>
+                                    <td>310</td>
+                                    <td>310</td>
+                                    <td>310</td>
+                                    <td>0g</td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
                 <div class="actions">
@@ -347,6 +437,7 @@
                     </div>
                 </div>
             </div>-->
+            
         </div>
                                     
         <script src="lib/jquery/jquery-3.2.1.min.js"></script>

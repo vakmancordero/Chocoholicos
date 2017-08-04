@@ -1,9 +1,7 @@
 package com.devlabs.model;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -12,7 +10,6 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -29,7 +26,6 @@ public class Record implements Serializable {
     private Date date;
     private String description;
     private String comment;
-    private List<Payment> payments = new ArrayList<>();
     
     public Record() {
         
@@ -130,13 +126,4 @@ public class Record implements Serializable {
         this.comment = comment;
     }
     
-    @OneToMany(fetch=FetchType.LAZY, mappedBy="record")
-    public List<Payment> getPayments() {
-        return this.payments;
-    }
-    
-    public void setPayments(List<Payment> payments) {
-        this.payments = payments;
-    }
-
 }
