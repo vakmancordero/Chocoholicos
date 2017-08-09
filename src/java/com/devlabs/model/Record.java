@@ -17,7 +17,7 @@ import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
 
 @Entity
-@Table(name="record", catalog="chocoholicos")
+@Table(name="record")
 public class Record implements Serializable {
 
     private Long id;

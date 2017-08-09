@@ -9,7 +9,7 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 @Entity
-@Table(name="provider", catalog="chocoholicos")
+@Table(name="provider")
 public class Provider implements Serializable {
     
     private Long id;
@@ -34,6 +34,15 @@ public class Provider implements Serializable {
         this.cp = cp;
         this.user = user;
         this.password = password;
+    }
+    
+    public Provider(String name, String address, String city, String state, 
+            String cp) {
+        this.name = name;
+        this.address = address;
+        this.city = city;
+        this.state = state;
+        this.cp = cp;
     }
     
     @Id 

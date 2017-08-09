@@ -2,13 +2,13 @@ package com.devlabs.servlet;
 
 import com.devlabs.model.Member;
 import com.devlabs.model.Provider;
-import com.devlabs.model.Record;
 import com.devlabs.model.Service;
 import com.devlabs.service.UserService;
-import com.devlabs.util.JsonServletHelper;
 import com.google.gson.Gson;
+
 import java.io.IOException;
 import java.io.PrintWriter;
+
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -16,7 +16,9 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+
 import java.util.List;
+import javax.servlet.http.HttpSession;
 
 /**
  *
@@ -47,6 +49,7 @@ public class UserController extends HttpServlet {
         response.setCharacterEncoding(ENCODING_UTF8);
         
         String type = request.getParameter("type");
+        String action = request.getParameter("action");
         
         if (type != null) {
             
@@ -77,6 +80,23 @@ public class UserController extends HttpServlet {
                 writer.print("{\"services\": " + gson.toJson(services) + "}");
                 
             }
+            
+        } else {
+            
+            if (action != null) {
+                
+                if (action.equalsIgnoreCase("closeSession")) {
+                    
+                    HttpSession session = request.getSession(false);
+                    
+                    if (session != null) session.invalidate();
+                    
+                    response.sendRedirect("home.jsp");
+                    
+                }
+                
+            }
+            
             
         }
         
@@ -163,6 +183,22 @@ public class UserController extends HttpServlet {
                 
                 writer.print(editedMember);
                 
+            } else if (action.equals("edit_provider")) {
+                
+                String user = request.getParameter("user");
+                JsonObject object = new JsonParser().parse(user).getAsJsonObject();
+                
+                Provider provider = this.getProvider(object, true);
+                
+                System.out.println("Proveedor a editar con ID = " + provider.getId());
+                
+                boolean editedMember = this.userService.editProvider(provider);
+                
+                System.out.println("Editado? " + editedMember);
+                
+                writer.print(editedMember);
+                
+                
             } else if (action.equals("delete_member")) {
                 
                 Long id = new Long(request.getParameter("id"));
@@ -174,6 +210,18 @@ public class UserController extends HttpServlet {
                 System.out.println("Eliminado? " + deletedMember);
                 
                 writer.print(deletedMember);
+                
+            } else if (action.equals("delete_provider")) {
+                
+                Long id = new Long(request.getParameter("id"));
+                
+                System.out.println("Proveedor a eliminar con ID = " + id);
+                
+                boolean deletedProvider = this.userService.deleteProvider(id);
+                
+                System.out.println("Eliminado? " + deletedProvider);
+                
+                writer.print(deletedProvider);
                 
             }
             
@@ -195,6 +243,24 @@ public class UserController extends HttpServlet {
             member.setId(object.get("id").getAsLong());
         
         return member;
+    }
+    
+    private Provider getProvider(JsonObject object, boolean hasId) {
+        
+        Provider provider = new Provider(
+                object.get("name").getAsString(),
+                object.get("address").getAsString(),
+                object.get("city").getAsString(),
+                object.get("state").getAsString(),
+                object.get("cp").getAsString(),
+                object.get("user").getAsString(),
+                object.get("password").getAsString()
+        );
+        
+        if (hasId)
+            provider.setId(object.get("id").getAsLong());
+        
+        return provider;
     }
     
     @Override

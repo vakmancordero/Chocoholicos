@@ -20,6 +20,9 @@ app.controller('ChocoController', function ($scope, $http) {
     $scope.cities = [];
     $scope.states = [];
     
+    $scope.counterUsers;
+    $scope.counterConsultations;
+    
     angular.element(document).ready(function () {
         
         initElements();
@@ -349,6 +352,107 @@ app.controller('ChocoController', function ($scope, $http) {
         
     };
     
+    $scope.deleteProvider = function (index) {
+        
+        var provider = $scope.providers[index];
+        var id = provider.id;
+        
+        swal({
+            title: 'Estás seguro?',
+            text: "Eliminarás al proveedor: " + provider.name,
+            type: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Si, eliminar' 
+        }).then(function () {
+            
+            $.ajax({
+                type: 'POST',
+                url: 'UserController',
+                data: {
+                    action : "delete_provider",
+                    id: id
+                },
+                success: function (result) {
+                    
+                    if (result === true) {
+                        
+                        $scope.providers.splice(index, 1);
+
+                        $scope.$apply();
+                        
+                        swal(
+                            'Correcto!',
+                            'Proveedor eliminado!',
+                            'success'
+                        );
+
+                    } else {
+
+                        swal(
+                            'Error!',
+                            'No se ha podido eliminar al proveedor!',
+                            'error'
+                        );
+
+                    }
+
+                }
+
+            });
+            
+        });
+        
+    };
+    
+    $scope.editProvider = function() {
+        
+        $.ajax({
+            type: 'POST',
+            url: 'UserController',
+            data: {
+                action : "edit_provider",
+                user : JSON.stringify($scope.user)
+            },
+            success: function (result) {
+                
+                console.log(result);
+                
+                if (result === true) {
+                    
+                    $scope.user = {};
+                    
+                    $scope.$apply();
+                    
+                    swal(
+                        'Correcto!',
+                        'Usuario editado!',
+                        'success'
+                    );
+            
+                    fillProviders();
+                    
+                    $scope.openListUsersMl();
+                    
+                } else {
+                    
+                    console.log(result);
+                    
+                    swal(
+                        'Error!',
+                        'No se ha podido editar al usuario!',
+                        'error'
+                    );
+                    
+                }
+                
+            }
+
+        });
+        
+    };
+    
     $scope.saveConsultation = function() {
         
         var consultation = {};
@@ -373,9 +477,10 @@ app.controller('ChocoController', function ($scope, $http) {
                     fillConsultations();
                     
                     $scope.consultation = {};
-                    $scope.$apply();
                     
                     $scope.closeAddConsultationMl();
+                    
+                    $scope.$apply();
                     
                     swal(
                         'Correcto!',
@@ -431,9 +536,47 @@ app.controller('ChocoController', function ($scope, $http) {
             observeChanges: true,
             onHide: function(){
                 $scope.user = {};
+                
+                console.log("Cerrando modal de búsqueda");
             },
             onShow: function() {
+            }
+        }).modal('show');
+        
+    };
+    
+    $scope.openListUserMlReport = function() {
+        
+        var modal = $('#listUsersMl');
+        
+        modal.modal({
+            observeChanges: true,
+            onHide: function(){
+                $scope.user = {};
+                
                 console.log("Cerrando modal de búsqueda");
+            },
+            onShow: function() {
+                
+                swal({
+                    title: '<i>Generar reportes</i>',
+                    type: 'info',
+                    html:
+                            'Elige un proveedor de la lista y da click en <b>Generar reporte</b>',
+                    showCloseButton: true,
+                    showCancelButton: true,
+                    confirmButtonText:
+                            'Ok!',
+                    cancelButtonText:
+                            'Cancelar'
+                }).then(function () {
+                    
+                }, function (dismiss) {
+                    if (dismiss === 'cancel') {
+                        modal.modal('hide');
+                    }
+                });
+                
             }
         }).modal('show');
         
@@ -445,7 +588,32 @@ app.controller('ChocoController', function ($scope, $http) {
         
         console.log($scope.user);
         
-        $('#editMemberMl').modal({
+        $('#editProviderMl').modal({
+            observeChanges: true,
+            onHide: function(){
+                $scope.user = {};
+                console.log("Cerrando modal editar miembro");
+            },
+            onShow: function() {
+                
+            }
+        }).modal('show');
+        
+    };
+    
+    $scope.closeEditMemberMl = function() {
+        $('#editProviderMl').modal('hide');
+    };
+    
+    $scope.openEditProviderMl = function(index) {
+        
+        $scope.user = $scope.providers[index];
+        
+        console.log("here");
+        
+        console.log($scope.user);
+        
+        $('#editProviderMl').modal({
             observeChanges: true,
             onHide: function(){
                 $scope.user = {};
@@ -457,8 +625,8 @@ app.controller('ChocoController', function ($scope, $http) {
         
     };
     
-    $scope.closeEditMemberMl = function() {
-        $('#editMemberMl').modal('hide');
+    $scope.closeEditProviderMl = function() {
+        $('#editProviderMl').modal('hide');
     };
     
     // Abrir modal de añadir consultas

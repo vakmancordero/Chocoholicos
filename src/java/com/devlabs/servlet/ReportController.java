@@ -4,12 +4,14 @@ import com.devlabs.model.Provider;
 import com.devlabs.model.Record;
 import com.devlabs.model.report.SimpleRecord;
 import com.devlabs.service.ConsultationService;
+import com.devlabs.util.DateUtil;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -40,6 +42,14 @@ public class ReportController extends HttpServlet {
         
         Provider provider = this.consultationService.getProvider(providerId);
         
+        if (provider == null) {
+            PrintWriter writer = response.getWriter();
+            
+            writer.print("<h1>No hay datos del usuario al que se intenta acceder</h1>");
+            
+            return;
+        }
+        
         List<Record> records = this.consultationService.getConsultationsById(providerId);
         
         URL url = getClass().getClassLoader().getResource("com/devlabs/util/resources/chocoReport.jasper");
@@ -58,8 +68,8 @@ public class ReportController extends HttpServlet {
         
         Map parameters = new HashMap();
         
-        parameters.put("provider", provider.getName());
-        parameters.put("details", "some details");
+        parameters.put("provider", "Proveedor: " + provider.getName());
+        parameters.put("details", "Fecha: " + DateUtil.getSimpleDateTime(new Date(), "void"));
         
         try {
             

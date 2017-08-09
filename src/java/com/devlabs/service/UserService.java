@@ -39,14 +39,19 @@ public class UserService {
     }
     
     public boolean deleteMember(Long id) {
-        
-        Member member = this.memberDao.read(id);
-        
-        return this.memberDao.delete(member);
+        return this.memberDao.delete(this.memberDao.read(id));
     }
     
     public boolean createProvider(Provider provider) {
         return this.providerDao.create(provider) != null;
+    }
+    
+    public boolean editProvider(Provider provider) {
+        return this.providerDao.update(provider);
+    }
+    
+    public boolean deleteProvider(Long id) {
+        return this.providerDao.delete(this.providerDao.read(id));
     }
     
     public List<Provider> getProviders() {
