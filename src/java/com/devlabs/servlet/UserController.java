@@ -2,8 +2,10 @@ package com.devlabs.servlet;
 
 import com.devlabs.model.Member;
 import com.devlabs.model.Provider;
+import com.devlabs.model.Record;
 import com.devlabs.model.Service;
 import com.devlabs.service.UserService;
+import com.devlabs.util.JsonServletHelper;
 import com.google.gson.Gson;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -24,7 +26,10 @@ public class UserController extends HttpServlet {
     
     private final UserService userService = new UserService();
 
-    private Gson gson = new Gson();
+    private final Gson gson = new Gson();
+    
+    public static final String ENCODING_UTF8 = "UTF-8";
+    public static final String CONTENTTYPE_JSON = "application/json";
     
     @Override
     public void init() throws ServletException {
@@ -38,7 +43,8 @@ public class UserController extends HttpServlet {
         
         PrintWriter writer = response.getWriter();
         
-        response.setContentType("application/json");
+        response.setContentType(CONTENTTYPE_JSON);
+        response.setCharacterEncoding(ENCODING_UTF8);
         
         String type = request.getParameter("type");
         
@@ -82,82 +88,115 @@ public class UserController extends HttpServlet {
         
         PrintWriter writer = response.getWriter();
         
+        response.setContentType(CONTENTTYPE_JSON);
+        response.setCharacterEncoding(ENCODING_UTF8);
+        
         String action = request.getParameter("action");
         
         System.out.println(action);
         
         if (action != null) {
             
-            switch (action.toLowerCase()) {
+            action = action.toLowerCase();
+            
+            if (action.equals("save")) {
                 
-                case "save":
+                String user = request.getParameter("user");
+                JsonObject object = new JsonParser().parse(user).getAsJsonObject();
+                
+                String type = object.get("type").getAsString();
+                
+                boolean saved = false;
+                
+                if (type.equalsIgnoreCase("member")) {
                     
-                    String user = request.getParameter("user");
-                    JsonObject object = new JsonParser().parse(user).getAsJsonObject();
+                    Member member = this.getMember(object, false);
                     
-                    String type = object.get("type").getAsString();
+                    saved = this.userService.createMember(member);
                     
-                    boolean saved = false;
+                } else if (type.equalsIgnoreCase("provider")) {
                     
-                    if (type.equalsIgnoreCase("member")) {
-                        
-                        Member member = new Member(
-                                object.get("name").getAsString(), 
-                                object.get("address").getAsString(), 
-                                object.get("city").getAsString(), 
-                                object.get("state").getAsString(), 
-                                object.get("cp").getAsString()
-                        );
-                        
-                        saved = this.userService.createMember(member);
-                        
-                    } else if (type.equalsIgnoreCase("provider")) {
-                        
-                        Provider provider = new Provider(
-                                object.get("name").getAsString(), 
-                                object.get("address").getAsString(), 
-                                object.get("city").getAsString(), 
-                                object.get("state").getAsString(), 
-                                object.get("cp").getAsString(),
-                                object.get("user").getAsString(),
-                                object.get("password").getAsString()
-                        );
-                        
-                        saved = this.userService.createProvider(provider);
-                        
-                    }
+                    Provider provider = new Provider(
+                            object.get("name").getAsString(),
+                            object.get("address").getAsString(),
+                            object.get("city").getAsString(),
+                            object.get("state").getAsString(),
+                            object.get("cp").getAsString(),
+                            object.get("user").getAsString(),
+                            object.get("password").getAsString()
+                    );
                     
-                    writer.print(saved);
+                    saved = this.userService.createProvider(provider);
                     
-                    break;
+                }
+                
+                writer.print(saved);
+                
+            } else if (action.equals("list")) {
+                
+                String typeUser = request.getParameter("type");
+                
+                if (typeUser.equalsIgnoreCase("member")) {
                     
-                case "list":
+                    writer.print(gson.toJson(this.userService.getMembers()));
                     
-                    String typeUser = request.getParameter("type");
+                } else if (typeUser.equalsIgnoreCase("provider")) {
                     
-                    if (typeUser.equalsIgnoreCase("member")) {
-                        
-                        writer.print(gson.toJson(this.userService.getMembers()));
-                        
-                    } else if (typeUser.equalsIgnoreCase("provider")) {
-                        
-                        writer.print(gson.toJson(this.userService.getProviders()));
-                        
-                    }
+                    List<Provider> providers = this.userService.getProviders();
                     
-                    break;
+                    writer.print(gson.toJson(providers));
                     
-                case "delete":
-                    
-                    break;
-                    
-                default:
-                    throw new AssertionError();
+                }
+                
+            } else if (action.equals("edit_member")) {
+                
+                String user = request.getParameter("user");
+                JsonObject object = new JsonParser().parse(user).getAsJsonObject();
+                
+                Member member = this.getMember(object, true);
+                
+                System.out.println("Miembro a editar con ID = " + member.getId());
+                
+                boolean editedMember = this.userService.editMember(member);
+                
+                System.out.println("Editado? " + editedMember);
+                
+                writer.print(editedMember);
+                
+            } else if (action.equals("delete_member")) {
+                
+                Long id = new Long(request.getParameter("id"));
+                
+                System.out.println("Miembro a eliminar con ID = " + id);
+                
+                boolean deletedMember = this.userService.deleteMember(id);
+                
+                System.out.println("Eliminado? " + deletedMember);
+                
+                writer.print(deletedMember);
+                
             }
             
         }
         
     }
+    
+    private Member getMember(JsonObject object, boolean hasId) {
+        
+        Member member = new Member(
+                object.get("name").getAsString(),
+                object.get("address").getAsString(),
+                object.get("city").getAsString(),
+                object.get("state").getAsString(),
+                object.get("cp").getAsString()
+        );
+        
+        if (hasId)
+            member.setId(object.get("id").getAsLong());
+        
+        return member;
+    }
+    
     @Override
     public String getServletInfo() {
         return "UserController Info";

@@ -6,6 +6,7 @@ import com.devlabs.model.Service;
 
 import com.devlabs.persistence.dao.MemberDao;
 import com.devlabs.persistence.dao.ProviderDao;
+import com.devlabs.persistence.dao.RecordDao;
 import com.devlabs.persistence.dao.ServiceDao;
 
 import java.util.List;
@@ -31,6 +32,17 @@ public class UserService {
     
     public boolean createMember(Member member) {
         return this.memberDao.create(member) != null;
+    }
+    
+    public boolean editMember(Member member) {
+        return this.memberDao.update(member);
+    }
+    
+    public boolean deleteMember(Long id) {
+        
+        Member member = this.memberDao.read(id);
+        
+        return this.memberDao.delete(member);
     }
     
     public boolean createProvider(Provider provider) {

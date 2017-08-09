@@ -9,6 +9,9 @@ import com.devlabs.persistence.dao.ProviderDao;
 
 import com.devlabs.persistence.dao.RecordDao;
 import com.devlabs.persistence.dao.ServiceDao;
+import java.util.List;
+import org.hibernate.Criteria;
+import org.hibernate.criterion.Restrictions;
 
 /**
  *
@@ -23,6 +26,20 @@ public class ConsultationService {
     
     public ConsultationService() {
         
+    }
+    
+    public List<Record> getConsultationsById(Long id) {
+        
+        Criteria recordsCriteria = this.recordDao.getSession().createCriteria(
+                this.recordDao.clazz()).add(
+                        Restrictions.eq("provider.id", id)
+                );
+        
+        return this.recordDao.readByCriteria(recordsCriteria);
+    }
+    
+    public List<Record> getRecords() {
+        return this.recordDao.readAll();
     }
     
     public boolean createConsultation(Record record) {

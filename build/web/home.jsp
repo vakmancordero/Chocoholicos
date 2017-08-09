@@ -4,7 +4,7 @@
     Author     : VakSF
 --%>
 
-<%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib uri = "http://java.sun.com/jsp/jstl/core" prefix = "c" %>
 <!DOCTYPE html>
 <html>
@@ -20,7 +20,7 @@
         
         <title>.: Chocoholicos :.</title>
     </head>
-    <body>
+    <body class="grey-background">
         
         <%
             if (request.getSession().getAttribute("loggedUser") == null) 
@@ -62,6 +62,10 @@
                                 <a class="item" ng-click="openListConsultationsMl()">
                                     <i class="doctor icon"></i>
                                     Listar consultas
+                                </a>
+                                <a class="item" ng-click="openFindMemberMl()">
+                                    <i class="doctor icon"></i>
+                                    Buscar membresía
                                 </a>
                             </div>
                         </div>
@@ -159,8 +163,8 @@
                 </div>
             </div>
                                         
-            <!--Usuarios-->
-            <div id="addUserMl" class="ui modal" >
+            <!-- Crear usuario -->
+            <div id="addUserMl" class="ui large modal" >
                 <i class="close icon"></i>
                 <div class="header">
                     Nuevo usuario
@@ -193,19 +197,22 @@
                                         </div>
                                         <div class="field">
                                             <label>Ciudad</label>
-                                            <select class="ui fluid dropdown" ng-model="user.city" required>
-                                                <option disabled selected value> -- Seleccionar -- </option>
-                                                <option value="Tuxtla Gutierrez">Tuxtla Gutiérrez</option>
+                                            <select ng-model="user.city" 
+                                                    ng-options="city for city in cities"
+                                                    ng-change="changeCity()"
+                                                    ng-init="user.city = initCity()" required>
+                                                <option value="">--</option>
                                             </select>
                                         </div>
                                     </div>
                                     <div class="field">
                                         <div class="eight wide field">
                                             <label>Estado</label>
-                                            <select class="ui fluid dropdown" ng-model="user.state" required>
-                                                <option disabled selected value> -- Seleccionar -- </option>
-                                                <option value="Activo">Activo</option>
-                                                <option value="Inactivo">Inactivo</option>
+                                            <select ng-model="user.state" 
+                                                    ng-options="state for state in states"
+                                                    ng-change="changeState()"
+                                                    ng-init="user.state = initState()" required>
+                                                <option value="">--</option>
                                             </select>
                                         </div>
                                     </div>
@@ -239,19 +246,22 @@
                                         </div>
                                         <div class="field">
                                             <label>Ciudad</label>
-                                            <select class="ui fluid dropdown" ng-model="user.city" required>
-                                                <option disabled selected value> -- Seleccionar -- </option>
-                                                <option value="Tuxtla Gutierrez">Tuxtla Gutiérrez</option>
+                                            <select ng-model="user.city" 
+                                                    ng-options="city for city in cities"
+                                                    ng-change="changeCity()"
+                                                    ng-init="user.city = initCity()" required>
+                                                <option value="">--</option>
                                             </select>
                                         </div>
                                     </div>
                                     <div class="field">
                                         <div class="eight wide field">
                                             <label>Estado</label>
-                                            <select class="ui fluid dropdown" ng-model="user.state" required>
-                                                <option disabled selected value> -- Seleccionar -- </option>
-                                                <option value="active">Activo</option>
-                                                <option value="inactive">Inactivo</option>
+                                            <select ng-model="user.state" 
+                                                    ng-options="state for state in states"
+                                                    ng-change="changeState()"
+                                                    ng-init="user.state = initState()" required>
+                                                <option value="">--</option>
                                             </select>
                                         </div>
                                     </div>
@@ -269,8 +279,68 @@
                 </div>
             </div>
             
-            <!--Consultas-->
-            <div id="addConsultationMl" class="ui modal" >
+            <!-- Editar miembro -->
+            <div id="editMemberMl" class="ui large modal" >
+                <i class="close icon"></i>
+                <div class="header">
+                    Editar miembro
+                </div>
+                <div class="image content">
+                    <div class="description">
+                        <form class="ui form" ng-submit="editMember()">
+                            <h4 class="ui dividing header">Información del miembro</h4>
+                            <div class="field">
+                                <label>ID:</label>
+                                <input type="text" placeholder="Nombre" ng-model="user.id" readonly>
+                            </div>
+                            <div class="field">
+                                <label>Nombre:</label>
+                                <input type="text" placeholder="Nombre" ng-model="user.name" required>
+                            </div>
+                            <div class="field">
+                                <label>Dirección:</label>
+                                <input type="text" placeholder="Dirección" ng-model="user.address" required>
+                            </div>
+                            <div class="two fields">
+                                <div class="field">
+                                    <label>Código postal:</label>
+                                    <input type="text"  placeholder="CP" ng-model="user.cp" required>
+                                </div>
+                                <div class="field">
+                                    <label>Ciudad</label>
+                                    <select ng-model="user.city" 
+                                            ng-options="city for city in cities"
+                                            ng-change="changeCity()"
+                                            ng-init="user.city = initCity()">
+                                        <option value="">--</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="field">
+                                <div class="eight wide field">
+                                    <label>Estado</label>
+                                    <select ng-model="user.state" 
+                                            ng-options="state for state in states"
+                                            ng-change="changeState()"
+                                            ng-init="user.state = initState()">
+                                        <option value="">--</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <button class="ui button" type="submit">Finalizar</button>
+                        </form>
+                    </div>
+                </div>
+                <div class="actions">
+                    <div class="ui negative right labeled icon button">
+                        Cerrar
+                        <i class="checkmark icon"></i>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Crear consultas -->
+            <div id="addConsultationMl" class="ui large modal" >
                 <i class="close icon"></i>
                 <div class="header">
                     Nueva consulta
@@ -286,10 +356,11 @@
                             <div class="field">
                                 <label>Servicio:</label>
                                 <div class="ui search" id="search_service">
-                                    <div class="ui fluid icon input">
+                                    <div class="ui action left icon input">
+                                        <i class="search icon"></i>
                                         <input class="prompt" type="text" placeholder="Buscar servicio..."
                                                 ng-model="consultation.service" required>
-                                        <i class="search icon"></i>
+                                        <div class="ui teal button">Search</div>
                                     </div>
                                     <div class="results"></div>
                                 </div>
@@ -297,10 +368,11 @@
                             <div class="field">
                                 <label>Proveedor:</label>
                                 <div class="ui search" id="search_provider">
-                                    <div class="ui fluid icon input">
+                                    <div class="ui action left icon input">
+                                        <i class="search icon"></i>
                                         <input class="prompt" type="text" placeholder="Buscar proveedor..."
                                                ng-model="consultation.provider" required>
-                                        <i class="search icon"></i>
+                                        <div class="ui grey button">Search</div>
                                     </div>
                                     <div class="results"></div>
                                 </div>
@@ -308,10 +380,11 @@
                             <div class="field">
                                 <label>Miembro:</label>
                                 <div class="ui search" id="search_member">
-                                    <div class="ui fluid icon input">
+                                    <div class="ui action left icon input">
+                                        <i class="search icon"></i>
                                         <input class="prompt" type="text" placeholder="Buscar miembro..."
                                                ng-model="consultation.member" required>
-                                        <i class="search icon"></i>
+                                        <div class="ui grey button">Search</div>
                                     </div>
                                     <div class="results"></div>
                                 </div>
@@ -336,22 +409,24 @@
                 </div>
             </div>
             
-            <div id="listUsersMl" class="ui modal" >
+            <!-- Usuarios -->
+            <div id="listUsersMl" class="ui large modal" >
                 <i class="close icon"></i>
                 <div class="header">
                     Tabla de usuarios
                 </div>
-                <div class="image content">
-                    <div class="description">
+                <div class="content">
+                    <div class="description ">
                         
                         <h1>Proveedores</h1>
-                        <table class="ui black table">
+                        <table class="ui inverted grey selectable celled tablet stackable table">
                             <thead>
                                 <tr>
                                     <th>Nombre</th>
                                     <th>Dirección</th>
                                     <th>Ciudad</th>
                                     <th>Estado</th>
+                                    <th>Informe</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -360,18 +435,21 @@
                                     <td>{{provider.address}}</td>
                                     <td>{{provider.city}}</td>
                                     <td>{{provider.state}}</td>
+                                    <td><button class="ui blue button" ng-click="generateReport($index)">Generar informe</button></td>
                                 </tr>
                             </tbody>
                         </table>
                                     
                         <h1>Miembros</h1>
-                        <table class="ui black table">
+                        <table class="ui inverted grey selectable celled tablet stackable table">
                             <thead>
                                 <tr>
                                     <th>Nombre</th>
                                     <th>Dirección</th>
                                     <th>Ciudad</th>
                                     <th>Estado</th>
+                                    <th>Editar</th>
+                                    <th>Eliminar</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -380,6 +458,102 @@
                                     <td>{{member.address}}</td>
                                     <td>{{member.city}}</td>
                                     <td>{{member.state}}</td>
+                                    <td><button class="ui blue button" ng-click="openEditMemberMl($index)">Editar</button></td>
+                                    <td><button class="ui red button"  ng-click="deleteMember($index)">Eliminar</button></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <button class="green ui button" ng-click="openAddUserMl()">Crear un miembro</button>
+                    </div>
+                </div>
+                <div class="actions">
+                    <div class="ui negative right labeled icon button">
+                        Cerrar
+                        <i class="checkmark icon"></i>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Buscar miembro -->
+            <div id="findMemberMl" class="ui large modal" >
+                <i class="close icon"></i>
+                <div class="header">
+                    Buscar membresía
+                </div>
+                <div class="image content">
+                    <div class="description">
+                        <h4 class="ui dividing header">Membresía del usuario</h4>
+                        <div class="field">
+                            <label>Miembro:</label>
+                            <div class="ui form">
+                                <div class="ui search" id="search_member_find">
+                                    <div class="ui action left icon input">
+                                        <i class="search icon"></i>
+                                        <input class="prompt" type="text" placeholder="Buscar miembro..."
+                                               ng-model="finder.search" required>
+                                        <div class="ui grey button">Search</div>
+                                    </div>
+                                    <div class="results"></div>
+                                </div>
+                                <div class="field">
+                                    <label>Nombre:</label>
+                                    <input type="text" placeholder="Nombre" ng-model="finder.name" readonly>
+                                </div>
+                                <div class="field">
+                                    <label>Dirección:</label>
+                                    <input type="text" placeholder="Dirección" ng-model="finder.address" readonly>
+                                </div>
+                                <div class="two fields">
+                                    <div class="field">
+                                        <label>Código postal:</label>
+                                        <input type="text"  placeholder="CP" ng-model="finder.cp" readonly>
+                                    </div>
+                                    <div class="field">
+                                        <label>Ciudad</label>
+                                        <input type="text" ng-model="finder.city" readonly>
+                                    </div>
+                                </div>
+                                <div class="field">
+                                    <label>Estado</label>
+                                    <input type="text" ng-model="finder.state" readonly>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="actions">
+                    <div class="ui negative right labeled icon button">
+                        Cerrar
+                        <i class="checkmark icon"></i>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Tabla de consultas -->
+            <div id="listConsultationsMl" class="ui large modal" >
+                <i class="close icon"></i>
+                <div class="header">
+                    Tabla de consultas
+                </div>
+                <div class="image content">
+                    <div class="description">
+                        <table class="ui inverted grey selectable celled right aligned tablet stackable table">
+                            <thead>
+                                <tr>
+                                    <th>Proveedor</th>
+                                    <th>Miembro</th>
+                                    <th>Servicio</th>
+                                    <th>Fecha creación</th>
+                                    <th>Fecha consulta</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="consultation in consultations track by $index">
+                                    <td>{{consultation.provider.name}}</td>
+                                    <td>{{consultation.member.name}}</td>
+                                    <td>{{consultation.service.name}}</td>
+                                    <td>{{consultation.currentDate}}</td>
+                                    <td>{{consultation.date}}</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -392,51 +566,6 @@
                     </div>
                 </div>
             </div>
-            
-            <!-- Tabla de consultas -->
-<!--            <div id="listConsultationsMl" class="ui modal" >
-                <i class="close icon"></i>
-                <div class="header">
-                    Tabla de consultas
-                </div>
-                <div class="image content">
-                    <div class="description">
-                        <table class="ui black table">
-                            <thead>
-                                <tr>
-                                    <th>Proveedor</th>
-                                    <th>Miembro</th>
-                                    <th>Servicio</th>
-                                    <th>Fecha creación</th>
-                                    <th>Fecha consulta</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr ng-repeat="consultation in consultations track by $index">
-                                    <td>{{consultation.provider}}</td>
-                                    <td>200</td>
-                                    <td>0g</td>
-                                    <td>0g</td>
-                                    <td>0g</td>
-                                </tr>
-                                <tr>
-                                    <td>Orange</td>
-                                    <td>310</td>
-                                    <td>310</td>
-                                    <td>310</td>
-                                    <td>0g</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-                <div class="actions">
-                    <div class="ui negative right labeled icon button">
-                        Cerrar
-                        <i class="checkmark icon"></i>
-                    </div>
-                </div>
-            </div>-->
             
         </div>
                                     

@@ -2,12 +2,18 @@ package com.devlabs.servlet;
 
 import com.devlabs.model.Record;
 import com.devlabs.service.ConsultationService;
+import static com.devlabs.servlet.UserController.CONTENTTYPE_JSON;
+import static com.devlabs.servlet.UserController.ENCODING_UTF8;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -19,17 +25,20 @@ import javax.servlet.http.HttpServletResponse;
  */
 public class ConsultationController extends HttpServlet {
     
-    private ConsultationService consultationService = new ConsultationService();
+    private final ConsultationService consultationService = new ConsultationService();
     
-    private Gson gson = new Gson();
+    private final Gson gson = new Gson();
     
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         
-//        PrintWriter writer = response.getWriter();
-//        
-//        writer.print(gson.toJson(this.consultationService.getRecords()));
+        response.setContentType(CONTENTTYPE_JSON);
+        response.setCharacterEncoding(ENCODING_UTF8);
+        
+        PrintWriter writer = response.getWriter();
+        
+        writer.print(gson.toJson(this.consultationService.getRecords()));
         
     }
 
@@ -45,19 +54,42 @@ public class ConsultationController extends HttpServlet {
             
             if (action.equalsIgnoreCase("save")) {
                 
-                String consultationSt = request.getParameter("consultation");
-                JsonObject consultation = new JsonParser().parse(consultationSt).getAsJsonObject();
+                try {
+                    
+                    String consultationSt = request.getParameter("consultation");
+                    
+                    JsonObject consultation = new JsonParser().parse(consultationSt).getAsJsonObject();
+                    
+                    Date date = new SimpleDateFormat("yyyy-MM-dd").parse(consultation.get("date").getAsString());
+                    
+                    Record record = new Record(
+                            this.consultationService.getMember(Long.parseLong(consultation.get("member").getAsString())),
+                            this.consultationService.getProvider(Long.parseLong(consultation.get("provider").getAsString())),
+                            this.consultationService.getService(Long.parseLong(consultation.get("service").getAsString())),
+                            new Date(), date,
+                            consultation.get("description").getAsString(),
+                            consultation.get("comment").getAsString()
+                    );
+                    
+                    if (this.consultationService.createConsultation(record)) {
+                        writer.print(record);
+                    } else {
+                        writer.print(false);
+                    }
+                    
+                } catch (ParseException ex) {
+                    
+                }
                 
-                Record record = new Record(
-                        this.consultationService.getMember(Long.parseLong(consultation.get("member").getAsString())),
-                        this.consultationService.getProvider(Long.parseLong(consultation.get("provider").getAsString())),
-                        this.consultationService.getService(Long.parseLong(consultation.get("service").getAsString())),
-                        new Date(), new Date(),
-                        consultation.get("description").getAsString(),
-                        consultation.get("comment").getAsString()
-                );
+            } else if (action.equalsIgnoreCase("generate_report")) {
                 
-                writer.print(this.consultationService.createConsultation(record));
+                Long providerId = new Long(request.getParameter("id"));
+                
+                List<Record> records = this.consultationService.getConsultationsById(providerId);
+                
+                
+                
+                System.out.println(Arrays.toString(records.toArray()));
                 
             }
             

@@ -1,3 +1,5 @@
+/* global swal */
+
 var app = angular.module('chocoApp', []);
 
 app.controller('ChocoController', function ($scope, $http) {
@@ -8,28 +10,57 @@ app.controller('ChocoController', function ($scope, $http) {
     $scope.member = {};
     $scope.service = {};
     
+    $scope.finder = {};
+    
     $scope.members = [];
     $scope.providers = [];
     $scope.consultations = [];
     
-    $scope.user.type = "";
+    // Simple Arrays
+    $scope.cities = [];
+    $scope.states = [];
     
     angular.element(document).ready(function () {
+        
         initElements();
         initValidator();
         
-        $.ajax({
-            type: 'POST',
-            url: 'UserController',
-            data: {
-                action: "list",
-                type: "member"
-            },
-            success: function (result) {
-                $scope.members = JSON.parse(result);
-            }
-
-        });
+        fillSimpleArrays();
+        
+        fillConsultations();
+        fillMembers();
+        fillProviders();
+        
+    });
+    
+    $scope.initCity = function () {
+        $scope.user.city = 'Tuxtla Gutierrez';
+    };
+    
+    $scope.initState = function () {
+        $scope.user.state = 'Activo';
+    };
+    
+    $scope.changeCity = function () {
+        console.log($scope.user.city);
+    };
+    
+    $scope.changeState = function () {
+        console.log($scope.user.city);
+    };
+    
+    function fillSimpleArrays() {
+        
+        $scope.cities.push('Tuxtla Gutierrez');
+        $scope.cities.push('San Cristóbal');
+        $scope.cities.push('Comitán');
+        
+        $scope.states.push('Activo');
+        $scope.states.push('Inactivo');
+        
+    }
+    
+    function fillProviders() {
         
         $.ajax({
             type: 'POST',
@@ -38,61 +69,131 @@ app.controller('ChocoController', function ($scope, $http) {
                 action: "list",
                 type: "provider"
             },
-            success: function (result) {
-                $scope.providers = JSON.parse(result);
+            success: function (providers) {
+                $scope.providers = providers;
+            }
+        });
+        
+    }
+    
+    function fillMembers() {
+        
+        $.ajax({
+            type: 'POST',
+            url: 'UserController',
+            data: {
+                action: "list",
+                type: "member"
+            },
+            success: function (members) {
+                $scope.members = members;
             }
 
         });
-    });
+        
+    }
+    
+    function fillConsultations() {
+        
+        $.ajax({
+            type: 'GET',
+            url: 'ConsultationController',
+            success: function (consultations) {
+                console.log(consultations);
+                $scope.consultations = consultations;
+            }
+        });
+        
+    }
 
-    $('#search_provider').search({
-        apiSettings: {
-            url: 'UserController?word={query}&type=provider'
-        },
-        fields: {
-            results : 'providers',
-            title   : 'name',
-            url     : 'html_url'
-        },
-        minCharacters : 1,
-        onSelect: function(provider, response) {
-            $scope.provider = provider;
-        }
+    $(function initSearchProvider() {
+        
+        $('#search_provider').search({
+            apiSettings: {
+                url: 'UserController?word={query}&type=provider'
+            },
+            fields: {
+                results : 'providers',
+                title   : 'name',
+                url     : 'html_url'
+            },
+            minCharacters : 1,
+            onSelect: function(provider, response) {
+                $scope.provider = provider;
+            }
+        });
+        
     });
     
-    $('#search_member').search({
-        apiSettings: {
-            url: 'UserController?word={query}&type=member'
-        },
-        fields: {
-            results : 'members',
-            title   : 'name',
-            url     : 'html_url'
-        },
-        minCharacters : 1,
-        onSelect: function(member, response) {
-            $scope.member = member;
-        }
+    $(function initSearchMember() {
+        
+        $('#search_member, #search_member_find').search({
+            apiSettings: {
+                url: 'UserController?word={query}&type=member'
+            },
+            fields: {
+                results : 'members',
+                title   : 'name',
+                url     : 'html_url'
+            },
+            minCharacters : 1,
+            onSelect: function(member, response) {
+            
+                var id = $(this).attr("id");
+                
+                if (id === "search_member_find") {
+                    
+                    console.log($scope.finder);
+                    
+                    $scope.finder.name = member.name;
+                    $scope.finder.address = member.address;
+                    $scope.finder.cp = member.cp;
+                    $scope.finder.city = member.city;
+                    $scope.finder.state = member.state;
+                    
+                    $scope.$apply();
+                    
+                    swal(
+                        'Correcto!',
+                        'Usuario encontrado!',
+                        'success'
+                    );
+                    
+                } else if (id === "search_member") {
+                    
+                    $scope.member = member;
+                    
+                }                
+
+            }
+        });
+        
     });
     
-    $('#search_service').search({
-        apiSettings: {
-            url: 'UserController?word={query}&type=service'
-        },
-        fields: {
-            results : 'services',
-            title   : 'name',
-            url     : 'html_url'
-        },
-        minCharacters : 1,
-        onSelect: function(service, response) {
-            $scope.service = service;
-        }
+    $(function initSearchService() {
+        
+        $('#search_service').search({
+            apiSettings: {
+                url: 'UserController?word={query}&type=service'
+            },
+            fields: {
+                results : 'services',
+                title   : 'name',
+                url     : 'html_url'
+            },
+            minCharacters : 1,
+            onSelect: function(service, response) {
+                $scope.service = service;
+            }
+        });
+        
     });
-
+    
     $scope.saveUser = function() {
         
-        if ($scope.user.type === "provider")
+        var userType = $scope.user.type;
+        
+        if (userType === "provider")
             if ($scope.user.password !== $scope.user.rePassword){
                 swal(
                     'Error!',
@@ -111,7 +212,10 @@ app.controller('ChocoController', function ($scope, $http) {
             },
             success: function (result) {
                 
-                if (result === "true") {
+                if (result === true) {
+                    
+                    if (userType === "provider")  $scope.providers.push($scope.user);
+                    else $scope.members.push($scope.user);
                     
                     $scope.user = {};
                     
@@ -122,8 +226,8 @@ app.controller('ChocoController', function ($scope, $http) {
                         'Usuario registrado!',
                         'success'
                     );
-                    
-                    setTimeout(function(){ window.location.reload(); }, 1000);
+            
+                    $scope.openListUsersMl();
                     
                 } else {
                     
@@ -131,7 +235,8 @@ app.controller('ChocoController', function ($scope, $http) {
                     
                     swal(
                         'Error!',
-                        'No se ha podido insertar el usuario!',
+                        'No se ha podido insertar al usuario! ' +
+                        'El usuario ya existe',
                         'error'
                     );
                     
@@ -139,6 +244,107 @@ app.controller('ChocoController', function ($scope, $http) {
                 
             }
 
+        });
+        
+    };
+    
+    $scope.editMember = function() {
+        
+        $.ajax({
+            type: 'POST',
+            url: 'UserController',
+            data: {
+                action : "edit_member",
+                user : JSON.stringify($scope.user)
+            },
+            success: function (result) {
+                
+                console.log(result);
+                
+                if (result === true) {
+                    
+                    $scope.user = {};
+                    
+                    $scope.$apply();
+                    
+                    swal(
+                        'Correcto!',
+                        'Usuario editado!',
+                        'success'
+                    );
+            
+                    fillMembers();
+                    
+                    $scope.openListUsersMl();
+                    
+                } else {
+                    
+                    console.log(result);
+                    
+                    swal(
+                        'Error!',
+                        'No se ha podido editar al usuario!',
+                        'error'
+                    );
+                    
+                }
+                
+            }
+
+        });
+        
+    };
+    
+    $scope.deleteMember = function (index) {
+        
+        var member = $scope.members[index];
+        var id = member.id;
+        
+        swal({
+            title: 'Estás seguro?',
+            text: "Eliminarás al miembro: " + member.name,
+            type: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Si, eliminar' 
+        }).then(function () {
+            
+            $.ajax({
+                type: 'POST',
+                url: 'UserController',
+                data: {
+                    action : "delete_member",
+                    id: id
+                },
+                success: function (result) {
+                    
+                    if (result === true) {
+                        
+                        $scope.members.splice(index, 1);
+
+                        $scope.$apply();
+                        
+                        swal(
+                            'Correcto!',
+                            'Miembro eliminado!',
+                            'success'
+                        );
+
+                    } else {
+
+                        swal(
+                            'Error!',
+                            'No se ha podido eliminar al miembro!',
+                            'error'
+                        );
+
+                    }
+
+                }
+
+            });
+            
         });
         
     };
@@ -162,10 +368,11 @@ app.controller('ChocoController', function ($scope, $http) {
             },
             success: function (result) {
                 
-                if (result === "true") {
+                if (result !== "false") {
+                    
+                    fillConsultations();
                     
                     $scope.consultation = {};
-                    
                     $scope.$apply();
                     
                     $scope.closeAddConsultationMl();
@@ -191,25 +398,110 @@ app.controller('ChocoController', function ($scope, $http) {
         });
         
     };
-
+    
+    $scope.generateReport = function (index) {
+        
+        var provider = $scope.providers[index];
+        
+        console.log(provider);
+        
+        $.ajax({
+            type: 'POST',
+            url: 'ConsultationController',
+            data: {
+                action: "generate_report",
+                id: provider.id
+            },
+            success: function (result) {
+                
+                console.log(result);
+                
+            }
+            
+        });
+            
+    };
+    
+    // Abrir modal de añadir usuarios
     $scope.openAddUserMl = function() {
-        $('#addUserMl').modal('show');
+        
+        var modal = $('#addUserMl');
+        
+        modal.modal({
+            observeChanges: true,
+            onHide: function(){
+                $scope.user = {};
+            },
+            onShow: function() {
+                console.log("Cerrando modal de búsqueda");
+            }
+        }).modal('show');
+        
     };
     
+    $scope.openEditMemberMl = function(index) {
+        
+        $scope.user = $scope.members[index];
+        
+        console.log($scope.user);
+        
+        $('#editMemberMl').modal({
+            observeChanges: true,
+            onHide: function(){
+                $scope.user = {};
+            },
+            onShow: function() {
+                console.log("Cerrando modal editar miembro");
+            }
+        }).modal('show');
+        
+    };
+    
+    $scope.closeEditMemberMl = function() {
+        $('#editMemberMl').modal('hide');
+    };
+    
+    // Abrir modal de añadir consultas
     $scope.openAddConsultationMl = function() {
-        $('#addConsultationMl').modal('show');
+        
+        $('#addConsultationMl').modal({
+            observeChanges: true,
+            onHide: function(){
+                $scope.consultation = {};
+            },
+            onShow: function() {
+                console.log("Cerrando modal de añadir consultas");
+            }
+        }).modal('show');
+        
     };
     
+    // Cerrar modal de añadir consultas
     $scope.closeAddConsultationMl = function() {
         $('#addConsultationMl').modal('hide');
     };
     
+    // Abrir modal de listar usuarios [Miembros y Proveedores]
     $scope.openListUsersMl = function() {
-        $('#listUsersMl').modal('show');
+        $('#listUsersMl').modal({observeChanges: true}).modal('show');
     };
     
+    // Abrir modal de listar consultas
     $scope.openListConsultationsMl = function() {
-        $('#listConsultationsMl').modal('show');
+        $('#listConsultationsMl').modal({observeChanges: true}).modal('show');
+    };
+    
+    $scope.openFindMemberMl = function() {
+        
+        $('#findMemberMl').modal({
+            onHide: function(){
+                $scope.finder = {};
+            },
+            onShow: function(){
+                console.log('shown');
+            }
+        }).modal('show');
+        
     };
     
     function initElements() {

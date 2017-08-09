@@ -2,9 +2,9 @@ package com.devlabs.model;
 
 import java.io.Serializable;
 import java.util.Date;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -13,6 +13,8 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
 
 @Entity
 @Table(name="record", catalog="chocoholicos")
@@ -36,6 +38,7 @@ public class Record implements Serializable {
         this.provider = provider;
         this.service = service;
     }
+    
     public Record(Member member, Provider provider, Service service, Date currentDate, 
             Date date, String description, String comment) {
         this.member = member;
@@ -58,7 +61,8 @@ public class Record implements Serializable {
         this.id = id;
     }
     
-    @ManyToOne(fetch=FetchType.LAZY)
+    @ManyToOne(cascade = CascadeType.ALL)
+    @LazyCollection(LazyCollectionOption.FALSE)
     @JoinColumn(name="member_id", nullable=false)
     public Member getMember() {
         return this.member;
@@ -68,7 +72,8 @@ public class Record implements Serializable {
         this.member = member;
     }
     
-    @ManyToOne(fetch=FetchType.LAZY)
+    @ManyToOne(cascade = CascadeType.ALL)
+    @LazyCollection(LazyCollectionOption.FALSE)
     @JoinColumn(name="provider_id", nullable=false)
     public Provider getProvider() {
         return this.provider;
@@ -78,7 +83,8 @@ public class Record implements Serializable {
         this.provider = provider;
     }
     
-    @ManyToOne(fetch=FetchType.LAZY)
+    @ManyToOne(cascade = CascadeType.ALL)
+    @LazyCollection(LazyCollectionOption.FALSE)
     @JoinColumn(name="service_id", nullable=false)
     public Service getService() {
         return this.service;
