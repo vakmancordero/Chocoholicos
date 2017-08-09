@@ -12,6 +12,10 @@
         <servlet-name>ConsultationController</servlet-name>
         <servlet-class>com.devlabs.servlet.ConsultationController</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>ReportController</servlet-name>
+        <servlet-class>com.devlabs.servlet.ReportController</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>LoginController</servlet-name>
         <url-pattern>/LoginController</url-pattern>
@@ -23,6 +27,10 @@
     <servlet-mapping>
         <servlet-name>ConsultationController</servlet-name>
         <url-pattern>/ConsultationController</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ReportController</servlet-name>
+        <url-pattern>/ReportController</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>

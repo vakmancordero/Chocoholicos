@@ -403,22 +403,22 @@ app.controller('ChocoController', function ($scope, $http) {
         
         var provider = $scope.providers[index];
         
-        console.log(provider);
+        window.open("ReportController?id=" + provider.id, '_blank');
         
-        $.ajax({
-            type: 'POST',
-            url: 'ConsultationController',
-            data: {
-                action: "generate_report",
-                id: provider.id
-            },
-            success: function (result) {
-                
-                console.log(result);
-                
-            }
-            
-        });
+//        $.ajax({
+//            type: 'POST',
+//            url: 'ConsultationController',
+//            data: {
+//                action: "generate_report",
+//                id: provider.id
+//            },
+//            success: function (result) {
+//                
+//                console.log(result);
+//                
+//            }
+//            
+//        });
             
     };
     

@@ -11,9 +11,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
 import java.util.Date;
-import java.util.List;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -80,16 +78,6 @@ public class ConsultationController extends HttpServlet {
                 } catch (ParseException ex) {
                     
                 }
-                
-            } else if (action.equalsIgnoreCase("generate_report")) {
-                
-                Long providerId = new Long(request.getParameter("id"));
-                
-                List<Record> records = this.consultationService.getConsultationsById(providerId);
-                
-                
-                
-                System.out.println(Arrays.toString(records.toArray()));
                 
             }
             
